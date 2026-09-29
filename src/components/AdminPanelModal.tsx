@@ -76,6 +76,9 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const [winRate, setWinRate] = useState<string>(
     String(systemSettings.winRatePercentage ?? 18)
   );
+  const [minWithdrawInput, setMinWithdrawInput] = useState<string>(
+    String(systemSettings.minWithdrawCoins ?? 5000)
+  );
   const [settingsSaved, setSettingsSaved] = useState(false);
 
   const handleResetUserStage = async (user: UserProfile) => {
@@ -275,17 +278,19 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
     });
   };
 
-  // Save System Settings (Starting coins & 20% algorithm)
+  // Save System Settings (Starting coins, 20% algorithm & min withdrawal)
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     const startCoins = parseFloat(startingBalance);
     const rate = parseFloat(winRate);
+    const minWithdraw = parseFloat(minWithdrawInput);
 
     await setDoc(
       doc(db, 'settings', 'config'),
       {
-        defaultStartingCoins: isNaN(startCoins) ? 100 : startCoins,
-        winRatePercentage: isNaN(rate) ? 20 : rate,
+        defaultStartingCoins: isNaN(startCoins) ? 0 : startCoins,
+        winRatePercentage: isNaN(rate) ? 18 : rate,
+        minWithdrawCoins: isNaN(minWithdraw) ? 5000 : minWithdraw,
         updatedAt: Date.now(),
       },
       { merge: true }
@@ -968,6 +973,26 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                       required
                       value={startingBalance}
                       onChange={(e) => setStartingBalance(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl py-2 px-3 text-white font-mono font-bold focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Minimum Withdrawal Amount */}
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-200 block uppercase tracking-wider text-[11px]">
+                    Minimum Player Withdrawal Amount (INR ₹)
+                  </label>
+                  <p className="text-[11px] text-slate-400">
+                    Claims below this amount cannot be submitted by users.
+                  </p>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="100"
+                      required
+                      value={minWithdrawInput}
+                      onChange={(e) => setMinWithdrawInput(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl py-2 px-3 text-white font-mono font-bold focus:outline-none focus:border-sky-400"
                     />
                   </div>

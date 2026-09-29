@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
 import {
-  Phone,
-  Lock,
-  User as UserIcon,
-  Eye,
-  EyeOff,
   Sparkles,
-  Gift,
   Flame,
-  CheckCircle2,
   AlertCircle,
   ShieldCheck,
-  ArrowRight,
-  TrendingUp,
+  Gift,
   Coins,
+  TrendingUp,
+  UserCheck,
+  ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -22,13 +17,8 @@ interface AuthLandingViewProps {
 }
 
 export const AuthLandingView: React.FC<AuthLandingViewProps> = ({ onSuccess }) => {
-  const { loginWithPhone, signupWithPhone, loginWithGoogle } = useAuth();
+  const { loginWithGoogle } = useAuth();
 
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
   const [referralCode, setReferralCode] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const urlParam = new URLSearchParams(window.location.search).get('ref');
@@ -41,68 +31,22 @@ export const AuthLandingView: React.FC<AuthLandingViewProps> = ({ onSuccess }) =
     }
     return '';
   });
-  const [showPassword, setShowPassword] = useState(false);
+
+  const [showReferralInput, setShowReferralInput] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return Boolean(new URLSearchParams(window.location.search).get('ref'));
+    }
+    return false;
+  });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const cleanDigits = phoneNumber.replace(/\D/g, '');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (cleanDigits.length < 10) {
-      setError('Please enter a valid 10-digit mobile number.');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
-      return;
-    }
-
-    if (mode === 'signup' && password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      if (mode === 'signin') {
-        await loginWithPhone(cleanDigits, password);
-      } else {
-        await signupWithPhone(
-          cleanDigits,
-          password,
-          displayName.trim() || undefined,
-          referralCode.trim() || undefined
-        );
-      }
-      onSuccess?.();
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        if (err.message.includes('auth/invalid-credential') || err.message.includes('wrong-password') || err.message.includes('user-not-found')) {
-          setError('Invalid phone number or password. Check your details or Sign Up if new.');
-        } else if (err.message.includes('email-already-in-use')) {
-          setError('This phone number is already registered. Please Sign In.');
-        } else if (err.message.includes('weak-password')) {
-          setError('Password is too weak. Please use at least 6 characters.');
-        } else {
-          setError(err.message);
-        }
-      } else {
-        setError('Authentication failed. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGoogleSignIn = async () => {
     setError(null);
     setLoading(true);
     try {
-      await loginWithGoogle();
+      await loginWithGoogle(referralCode.trim() || undefined);
       onSuccess?.();
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -110,25 +54,10 @@ export const AuthLandingView: React.FC<AuthLandingViewProps> = ({ onSuccess }) =
           setError(err.message);
         }
       } else {
-        setError('Google sign-in failed.');
+        setError('Google sign-in failed. Please try again.');
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleFillDemo = (type: 'user' | 'new') => {
-    if (type === 'user') {
-      setMode('signin');
-      setPhoneNumber('9876543210');
-      setPassword('password123');
-    } else {
-      setMode('signup');
-      const randomPhone = '98' + Math.floor(10000000 + Math.random() * 90000000);
-      setPhoneNumber(randomPhone);
-      setDisplayName(`Player_${randomPhone.slice(-4)}`);
-      setPassword('pass123456');
-      setConfirmPassword('pass123456');
     }
   };
 
@@ -137,14 +66,14 @@ export const AuthLandingView: React.FC<AuthLandingViewProps> = ({ onSuccess }) =
       {/* Top Banner / Ticker */}
       <div className="bg-gradient-to-r from-amber-600 via-rose-600 to-indigo-600 px-3 py-1.5 text-center text-[11px] font-black text-white tracking-wide flex items-center justify-center space-x-2 shadow-md">
         <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-spin" />
-        <span>WELCOME TO WINGO COLOR TRADING • 100% INR PAYOUTS (₹) • 1ST RECHARGE FREE BONUS</span>
+        <span>WELCOME TO WINGO COLOR TRADING • 100% INR PAYOUTS (₹) • MIN WITHDRAWAL ₹5,000</span>
         <Flame className="w-3.5 h-3.5 text-amber-200" />
       </div>
 
-      <div className="max-w-md w-full mx-auto px-4 py-6 flex-1 flex flex-col justify-center">
+      <div className="max-w-md w-full mx-auto px-4 py-8 flex-1 flex flex-col justify-center">
         {/* Brand Hero */}
         <div className="text-center mb-6 space-y-2">
-          <div className="inline-flex items-center justify-center p-3 bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 rounded-3xl shadow-[0_0_35px_rgba(244,63,94,0.4)] border-2 border-white/20">
+          <div className="inline-flex items-center justify-center p-3.5 bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 rounded-3xl shadow-[0_0_35px_rgba(244,63,94,0.4)] border-2 border-white/20">
             <span className="font-black text-3xl text-white tracking-tighter drop-shadow-md">WinGo</span>
           </div>
           <h1 className="text-2xl font-black tracking-tight text-white mt-2">
@@ -155,220 +84,76 @@ export const AuthLandingView: React.FC<AuthLandingViewProps> = ({ onSuccess }) =
           </p>
         </div>
 
-        {/* Auth Card */}
-        <div className="bg-[#121b2d] rounded-3xl border border-slate-700/80 shadow-2xl overflow-hidden p-5 sm:p-6 backdrop-blur-md">
-          {/* Tab Selector */}
-          <div className="flex bg-[#0b111e] p-1 rounded-2xl mb-5 border border-slate-800">
-            <button
-              type="button"
-              onClick={() => {
-                setMode('signin');
-                setError(null);
-              }}
-              className={`flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all cursor-pointer ${
-                mode === 'signin'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/20'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMode('signup');
-                setError(null);
-              }}
-              className={`flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all cursor-pointer ${
-                mode === 'signup'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/20'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Sign Up
-            </button>
+        {/* Auth Card - Google Only */}
+        <div className="bg-[#121b2d] rounded-3xl border border-slate-700/80 shadow-2xl overflow-hidden p-6 sm:p-7 backdrop-blur-md space-y-5">
+          <div className="text-center space-y-1">
+            <h2 className="text-lg font-black text-white">One-Click Google Access</h2>
+            <p className="text-xs text-slate-400">
+              Sign in or create your trader account instantly with Google. No password or phone required.
+            </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-semibold flex items-start space-x-2 animate-shake">
+            <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-semibold flex items-start space-x-2 animate-shake">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Display Name on Sign Up */}
-            {mode === 'signup' && (
-              <>
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                    Trader Nickname (Optional)
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                      <UserIcon className="w-4 h-4" />
-                    </div>
-                    <input
-                      type="text"
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder="e.g. Lucky Trader"
-                      className="w-full pl-9 pr-3 py-2.5 bg-[#0b111e] border border-slate-700 rounded-xl text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex justify-between">
-                    <span>Referral Code (Optional)</span>
-                    <span className="text-cyan-400 font-mono text-[10px]">Partner Code</span>
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-cyan-400">
-                      <Gift className="w-4 h-4" />
-                    </div>
-                    <input
-                      type="text"
-                      value={referralCode}
-                      onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                      placeholder="e.g. VIP888"
-                      className="w-full pl-9 pr-3 py-2.5 bg-[#0b111e] border border-slate-700 rounded-xl text-white text-xs font-mono placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 uppercase tracking-wider transition-colors"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Phone Number Input with +91 Country Code */}
-            <div>
-              <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                <span className="flex items-center space-x-1">
-                  <Phone className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Phone Number</span>
-                </span>
-                <span className="text-[10px] text-amber-400 font-mono">10 Digits</span>
-              </label>
-              <div className="flex rounded-xl overflow-hidden border border-slate-700 focus-within:border-amber-400 bg-[#0b111e] transition-colors">
-                <div className="px-3 py-2.5 bg-slate-800/80 border-r border-slate-700 text-xs font-bold text-slate-200 flex items-center space-x-1 shrink-0">
-                  <span>🇮🇳</span>
-                  <span>+91</span>
-                </div>
-                <input
-                  type="tel"
-                  maxLength={10}
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                  placeholder="Enter 10-digit mobile number"
-                  required
-                  className="flex-1 px-3 py-2.5 bg-transparent text-white text-xs tracking-wider placeholder:text-slate-500 focus:outline-none font-mono"
-                />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                <span className="flex items-center space-x-1">
-                  <Lock className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Password</span>
-                </span>
-                <span className="text-[10px] text-slate-400">Min 6 characters</span>
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
-                  required
-                  className="w-full px-3 py-2.5 pr-10 bg-[#0b111e] border border-slate-700 rounded-xl text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-200 cursor-pointer"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password on Sign Up */}
-            {mode === 'signup' && (
-              <div>
-                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                  Confirm Password
-                </label>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter password"
-                  required
-                  className="w-full px-3 py-2.5 bg-[#0b111e] border border-slate-700 rounded-xl text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition-colors"
-                />
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3.5 px-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all cursor-pointer bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-yellow-300 text-slate-950 shadow-lg shadow-amber-500/25 active:scale-95 disabled:opacity-50 flex items-center justify-center space-x-2"
-            >
-              {loading ? (
-                <span className="text-xs font-bold animate-pulse">Processing...</span>
-              ) : (
-                <>
-                  <span>{mode === 'signin' ? 'Sign In to Play' : 'Register & Start Playing'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Quick Demo Fill Buttons for Fast Testing */}
-          <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-800">
-            <span>Quick Test:</span>
-            <div className="flex space-x-2">
+          {/* Optional Referral Code Toggle/Input */}
+          <div className="space-y-2">
+            {!showReferralInput ? (
               <button
                 type="button"
-                onClick={() => handleFillDemo('user')}
-                className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 text-[10px] font-semibold cursor-pointer"
+                onClick={() => setShowReferralInput(true)}
+                className="text-[11px] font-bold text-cyan-400 hover:text-cyan-300 flex items-center space-x-1 mx-auto transition-colors cursor-pointer"
               >
-                Existing User
+                <Gift className="w-3.5 h-3.5" />
+                <span>Have a Subadmin Referral Code?</span>
               </button>
-              <button
-                type="button"
-                onClick={() => handleFillDemo('new')}
-                className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300 text-[10px] font-semibold cursor-pointer"
-              >
-                New Phone
-              </button>
-            </div>
+            ) : (
+              <div className="p-3 rounded-2xl bg-[#0b111e] border border-cyan-500/30 space-y-1.5 animate-fade-in">
+                <div className="flex justify-between items-center text-[10px] uppercase font-bold text-slate-400">
+                  <span className="flex items-center space-x-1 text-cyan-300">
+                    <Gift className="w-3 h-3 text-cyan-400" />
+                    <span>Referral / Partner Code</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowReferralInput(false)}
+                    className="text-slate-500 hover:text-slate-300"
+                  >
+                    Hide
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                  placeholder="e.g. VIP888"
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs font-mono font-bold placeholder:text-slate-600 focus:outline-none focus:border-cyan-400 uppercase tracking-wider"
+                />
+                <p className="text-[10px] text-slate-500">
+                  Connected to your subadmin partner for custom bonuses and coin transfers.
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Divider */}
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-800" />
-            </div>
-            <div className="relative flex justify-center text-[10px] uppercase font-bold text-slate-500">
-              <span className="bg-[#121b2d] px-3">or continue with</span>
-            </div>
-          </div>
-
-          {/* Google Sign-in */}
+          {/* Primary Action Button: Continue with Google */}
           <button
             type="button"
             disabled={loading}
             onClick={handleGoogleSignIn}
-            className="w-full py-2.5 px-4 rounded-xl border border-slate-700 hover:border-slate-500 bg-slate-900/80 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center space-x-2 transition-all cursor-pointer"
+            className={`w-full py-3.5 px-5 rounded-2xl font-black text-sm flex items-center justify-center space-x-3 transition-all cursor-pointer shadow-xl active:scale-[0.98] ${
+              loading
+                ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                : 'bg-white hover:bg-slate-100 text-slate-900 border border-white shadow-white/10 hover:shadow-white/20'
+            }`}
           >
-            <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center p-0.5">
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+            <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0">
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -387,11 +172,22 @@ export const AuthLandingView: React.FC<AuthLandingViewProps> = ({ onSuccess }) =
                 />
               </svg>
             </div>
-            <span>Continue with Google</span>
+            <span>{loading ? 'Connecting with Google...' : 'Continue with Google'}</span>
+            {!loading && <ArrowRight className="w-4 h-4 text-slate-700 ml-1" />}
           </button>
 
-          {/* Admin badge */}
-          <div className="mt-4 p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-[11px] text-slate-300 flex items-center space-x-2">
+          {/* Quick Notice */}
+          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+            <span className="flex items-center space-x-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Instant Verification</span>
+            </span>
+            <span>•</span>
+            <span className="text-amber-300 font-bold">Min Withdrawal: ₹5,000</span>
+          </div>
+
+          {/* Admin badge info */}
+          <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-[11px] text-slate-300 flex items-center space-x-2">
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
             <span className="leading-tight">
               Admin account <span className="text-amber-300 font-mono">tirupatibpo6@gmail.com</span> unlocks Admin Master Console automatically.
@@ -420,7 +216,7 @@ export const AuthLandingView: React.FC<AuthLandingViewProps> = ({ onSuccess }) =
             <div>
               <h4 className="text-xs font-bold text-white">Daily 2 Free Spins</h4>
               <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                2 free spins every day with max win up to ₹2 INR!
+                2 free spins every day with real INR rewards!
               </p>
             </div>
           </div>
@@ -432,7 +228,7 @@ export const AuthLandingView: React.FC<AuthLandingViewProps> = ({ onSuccess }) =
             <div>
               <h4 className="text-xs font-bold text-white">Daily Gift Check-In</h4>
               <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                Check in daily for ₹0.50 or ₹1.00 INR free gift!
+                Check in daily for free login bonuses!
               </p>
             </div>
           </div>
@@ -444,7 +240,7 @@ export const AuthLandingView: React.FC<AuthLandingViewProps> = ({ onSuccess }) =
             <div>
               <h4 className="text-xs font-bold text-white">Direct INR (₹)</h4>
               <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                All bets, wins and wallets in Indian Rupee (INR).
+                All bets, wins, and withdrawals in Indian Rupee (INR).
               </p>
             </div>
           </div>

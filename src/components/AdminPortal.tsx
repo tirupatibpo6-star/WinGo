@@ -93,6 +93,9 @@ export const AdminPortal: React.FC = () => {
   const [winRate, setWinRate] = useState<string>(
     String(systemSettings.winRatePercentage ?? 18)
   );
+  const [minWithdrawInput, setMinWithdrawInput] = useState<string>(
+    String(systemSettings.minWithdrawCoins ?? 5000)
+  );
   const [settingsSaved, setSettingsSaved] = useState(false);
 
   // Search filter
@@ -323,6 +326,7 @@ export const AdminPortal: React.FC = () => {
     e.preventDefault();
     const balance = Number(startingBalance) || 0;
     const rate = Math.min(20, Math.max(15, Number(winRate) || 18));
+    const minWithdraw = Math.max(100, Number(minWithdrawInput) || 5000);
 
     try {
       await setDoc(
@@ -330,6 +334,7 @@ export const AdminPortal: React.FC = () => {
         {
           defaultStartingCoins: balance,
           winRatePercentage: rate,
+          minWithdrawCoins: minWithdraw,
           updatedAt: Date.now(),
         },
         { merge: true }
@@ -1244,6 +1249,23 @@ export const AdminPortal: React.FC = () => {
                   onChange={(e) => setStartingBalance(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-700 rounded-xl py-2 px-3 text-white font-mono font-bold"
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-200 block uppercase tracking-wider text-[11px]">
+                  Minimum Player Withdrawal Amount (INR ₹)
+                </label>
+                <input
+                  type="number"
+                  min="100"
+                  required
+                  value={minWithdrawInput}
+                  onChange={(e) => setMinWithdrawInput(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl py-2 px-3 text-white font-mono font-bold"
+                />
+                <span className="text-[10px] text-slate-400">
+                  Player claims below this limit will be rejected automatically.
+                </span>
               </div>
 
               {settingsSaved && (

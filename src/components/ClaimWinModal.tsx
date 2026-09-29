@@ -33,7 +33,8 @@ export const ClaimWinModal: React.FC<ClaimWinModalProps> = ({
   onSuccess,
 }) => {
   const { currentUser, userProfile, systemSettings } = useAuth();
-  const [coinsToClaim, setCoinsToClaim] = useState<string>('500');
+  const minCoins = systemSettings.minWithdrawCoins || 5000;
+  const [coinsToClaim, setCoinsToClaim] = useState<string>('5000');
   const [method, setMethod] = useState<'upi' | 'binance' | 'trc20' | 'bank'>('upi');
   const [accountDetails, setAccountDetails] = useState<string>('');
   const [userWithdrawals, setUserWithdrawals] = useState<WithdrawalRequest[]>([]);
@@ -70,7 +71,6 @@ export const ClaimWinModal: React.FC<ClaimWinModalProps> = ({
 
   const currentBalance = userProfile?.coins || 0;
   const numCoins = parseFloat(coinsToClaim) || 0;
-  const minCoins = systemSettings.minWithdrawCoins || 500;
   const isInsufficient = numCoins > currentBalance;
   const isBelowMin = numCoins < minCoins;
 

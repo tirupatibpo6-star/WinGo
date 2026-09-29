@@ -47,7 +47,7 @@ const DEFAULT_SETTINGS: SystemSettings = {
   defaultStartingCoins: 0, // Free bonus will come after 1st recharge only
   winRatePercentage: 18, // Strict 15-20% win algorithm requested by user (default 18%)
   minRechargeAmount: 100,
-  minWithdrawCoins: 500,
+  minWithdrawCoins: 5000, // Minimum withdrawal is Rs 5000 (INR)
   announcement: 'Welcome to WinGo Color Trading! Enjoy fair games & instant INR payouts.',
   newPlayerRulesEnabled: true,
   updatedAt: Date.now(),
