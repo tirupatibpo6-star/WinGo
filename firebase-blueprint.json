@@ -1,0 +1,149 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with coins, role, recharge eligibility, and account details",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "phoneFormatted": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin", "subadmin"] },
+        "coins": { "type": "number" },
+        "referralCode": { "type": "string" },
+        "referredBy": { "type": "string" },
+        "referredByCode": { "type": "string" },
+        "assignedByAdmin": { "type": "string" },
+        "totalCoinsDistributed": { "type": "number" },
+        "isBlocked": { "type": "boolean" },
+        "hasRechargedToday": { "type": "boolean" },
+        "totalRechargesCount": { "type": "number" },
+        "hasFirstRechargeBonusClaimed": { "type": "boolean" },
+        "dailySpinCount": { "type": "number" },
+        "lastRechargeDate": { "type": "string" },
+        "lastSpinDate": { "type": "string" },
+        "lastDailyRewardDate": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["uid", "email", "role", "coins"]
+    },
+    "PaymentGateway": {
+      "title": "PaymentGateway",
+      "description": "Payment gateway created by admin for user coin recharges",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["upi", "binance", "trc20", "qr", "custom"] },
+        "title": { "type": "string" },
+        "details": { "type": "string" },
+        "qrImageUrl": { "type": "string" },
+        "ratePerCoin": { "type": "number" },
+        "instructions": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "type", "title", "details", "isActive"]
+    },
+    "RechargeRequest": {
+      "title": "RechargeRequest",
+      "description": "User coin recharge submission awaiting or approved by admin",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "gatewayId": { "type": "string" },
+        "gatewayType": { "type": "string" },
+        "amount": { "type": "number" },
+        "coins": { "type": "number" },
+        "transactionId": { "type": "string" },
+        "screenshotUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "number" },
+        "approvedAt": { "type": "number" }
+      },
+      "required": ["id", "userId", "userEmail", "amount", "coins", "transactionId", "status"]
+    },
+    "WithdrawalRequest": {
+      "title": "WithdrawalRequest",
+      "description": "User claim/withdrawal of winning coins",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "coinsAmount": { "type": "number" },
+        "currencyAmount": { "type": "number" },
+        "method": { "type": "string", "enum": ["upi", "binance", "trc20", "bank"] },
+        "accountDetails": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "processing", "completed", "rejected"] },
+        "adminNote": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "processedAt": { "type": "number" }
+      },
+      "required": ["id", "userId", "userEmail", "coinsAmount", "method", "accountDetails", "status"]
+    },
+    "SystemSettings": {
+      "title": "SystemSettings",
+      "description": "Global settings configured by admin",
+      "type": "object",
+      "properties": {
+        "defaultStartingCoins": { "type": "number" },
+        "winRatePercentage": { "type": "number" },
+        "minRechargeAmount": { "type": "number" },
+        "minWithdrawCoins": { "type": "number" },
+        "spinDailyCostOrRequirement": { "type": "string" },
+        "announcement": { "type": "string" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["defaultStartingCoins", "winRatePercentage"]
+    },
+    "CoinTransferRecord": {
+      "title": "CoinTransferRecord",
+      "description": "Log of coins transferred from admin to subadmin, or subadmin to user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fromUid": { "type": "string" },
+        "fromName": { "type": "string" },
+        "fromRole": { "type": "string", "enum": ["admin", "subadmin"] },
+        "toUid": { "type": "string" },
+        "toName": { "type": "string" },
+        "toEmail": { "type": "string" },
+        "amount": { "type": "number" },
+        "note": { "type": "string" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["id", "fromUid", "fromRole", "toUid", "toName", "amount", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles and coins balances"
+    },
+    "/gateways/{gatewayId}": {
+      "schema": "PaymentGateway",
+      "description": "Payment gateways configured by admin"
+    },
+    "/recharges/{rechargeId}": {
+      "schema": "RechargeRequest",
+      "description": "Coin recharge receipts submitted by users"
+    },
+    "/withdrawals/{withdrawalId}": {
+      "schema": "WithdrawalRequest",
+      "description": "Winning coin claim and withdrawal requests"
+    },
+    "/transfers/{transferId}": {
+      "schema": "CoinTransferRecord",
+      "description": "Coin distribution audit records"
+    },
+    "/settings/config": {
+      "schema": "SystemSettings",
+      "description": "Global admin configuration settings"
+    }
+  }
+}

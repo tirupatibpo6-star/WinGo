@@ -1,0 +1,6 @@
+{
+  "name": "WinGo - Color Trading Game with Coins",
+  "description": "Exciting real-time color trading & number prediction game with coins, multiple interval modes, live draw animations, order history, trends chart, and coin bonuses.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
