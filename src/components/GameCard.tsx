@@ -1,6 +1,6 @@
 import React from 'react';
-import { HelpCircle, ShieldAlert, Cpu, Sparkles } from 'lucide-react';
-import { DrawResult, GameMode, PlayerStageInfo } from '../types';
+import { HelpCircle, ShieldAlert } from 'lucide-react';
+import { DrawResult, GameMode } from '../types';
 import { NumberBall } from './NumberBall';
 
 interface GameCardProps {
@@ -11,7 +11,6 @@ interface GameCardProps {
   secondsRemaining: number;
   isLocked: boolean;
   onOpenHowToPlay: () => void;
-  playerStageInfo?: PlayerStageInfo;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -22,7 +21,6 @@ export const GameCard: React.FC<GameCardProps> = ({
   secondsRemaining,
   isLocked,
   onOpenHowToPlay,
-  playerStageInfo,
 }) => {
   const minutes = Math.floor(secondsRemaining / 60);
   const seconds = secondsRemaining % 60;

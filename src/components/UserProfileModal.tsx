@@ -20,13 +20,11 @@ import {
   Calendar,
   Percent,
   Zap,
-  Cpu,
 } from 'lucide-react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { UserBet, RechargeRequest, WithdrawalRequest } from '../types';
-import { getPlayerStage } from '../utils/gameRules';
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -384,60 +382,6 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           {/* TAB 1: BETTING & WIN RATE STATISTICS */}
           {activeTab === 'stats' && (
             <div className="space-y-4">
-              {/* AI Algorithm Detection & Status Card */}
-              {(() => {
-                const stageInfo = getPlayerStage(userProfile, userBets);
-                return (
-                  <div className="p-3.5 rounded-xl bg-gradient-to-r from-slate-900 via-[#131d2e] to-slate-900 border border-slate-700/80 shadow-md space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-7 h-7 rounded-lg bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center">
-                          <Cpu className="w-4 h-4 text-cyan-400 animate-pulse" />
-                        </div>
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
-                            AI Player Detection
-                          </span>
-                          <span className="text-xs font-black text-white">
-                            {stageInfo.label}
-                          </span>
-                        </div>
-                      </div>
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${stageInfo.badgeColor}`}>
-                        {stageInfo.gamesPlayed < 3 ? `Step ${stageInfo.gamesPlayed + 1} of 3` : 'Strict AI Mode'}
-                      </span>
-                    </div>
-
-                    <div className="p-2.5 rounded-lg bg-black/30 border border-slate-800 text-[11px] text-slate-300 flex items-start space-x-2">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
-                      <div>
-                        <span className="font-bold text-amber-300">Algorithm Status: </span>
-                        <span>{stageInfo.description}</span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-1.5 text-center text-[10px] pt-1 border-t border-slate-800/80">
-                      <div className="bg-slate-950/60 p-1.5 rounded-md border border-slate-800/60">
-                        <span className="text-slate-400 block">Games Played</span>
-                        <span className="font-bold text-white font-mono">{stageInfo.gamesPlayed}</span>
-                      </div>
-                      <div className="bg-slate-950/60 p-1.5 rounded-md border border-slate-800/60">
-                        <span className="text-slate-400 block">Next Outcome</span>
-                        <span className={`font-bold uppercase ${
-                          stageInfo.nextOutcome === 'win' ? 'text-emerald-400' : stageInfo.nextOutcome === 'lose' ? 'text-rose-400' : 'text-sky-400'
-                        }`}>
-                          {stageInfo.nextOutcome}
-                        </span>
-                      </div>
-                      <div className="bg-slate-950/60 p-1.5 rounded-md border border-slate-800/60">
-                        <span className="text-slate-400 block">House Algorithm</span>
-                        <span className="font-bold text-cyan-300 font-mono">15-20% Rate</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
               {/* Top Key Metrics 4-Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 {/* Total Bets */}

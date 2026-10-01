@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, LogIn, AlertCircle, Sparkles, ShieldCheck, Gift, ArrowRight } from 'lucide-react';
+import { X, LogIn, AlertCircle, Gift, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface AuthModalProps {
@@ -74,7 +74,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 WinGo Account Access
               </h2>
               <p className="text-xs text-white/80">
-                INR Wallet &bull; Min Withdrawal ₹5,000
+                Play, Trade &amp; Win
               </p>
             </div>
           </div>
@@ -84,7 +84,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="p-6 space-y-4">
           <div className="text-center space-y-1">
             <p className="text-xs text-slate-300">
-              Sign in with your Google account. No passwords or phone OTP required.
+              Sign in with your Google account for instant access.
             </p>
           </div>
 
@@ -104,7 +104,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 className="text-[11px] font-bold text-cyan-400 hover:text-cyan-300 flex items-center space-x-1 mx-auto transition-colors cursor-pointer"
               >
                 <Gift className="w-3.5 h-3.5" />
-                <span>Enter Subadmin Partner Code</span>
+                <span>Enter Referral Code</span>
               </button>
             ) : (
               <div className="p-3 bg-[#0b111e] border border-cyan-500/30 rounded-2xl space-y-1.5 animate-fade-in">
@@ -166,13 +166,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <span>{loading ? 'Signing in...' : 'Continue with Google'}</span>
             {!loading && <ArrowRight className="w-3.5 h-3.5 text-slate-700 ml-1" />}
           </button>
-
-          {/* Quick Notice */}
-          <div className="pt-2 border-t border-slate-800 text-center">
-            <span className="text-[11px] text-amber-300 font-bold">
-              Minimum withdrawal: ₹5,000 INR
-            </span>
-          </div>
         </div>
       </div>
     </div>

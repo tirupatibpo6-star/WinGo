@@ -77,9 +77,6 @@ export default function App() {
     return [];
   });
 
-  // AI Player Stage Detection (Game 1 Win, Game 2 Lose, Game 3 Win, Old Player 15-20%)
-  const playerStageInfo = getPlayerStage(userProfile, userBets);
-
   // Modals State
   const [betModalOpen, setBetModalOpen] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState<{
@@ -390,7 +387,6 @@ export default function App() {
           secondsRemaining={secondsRemaining}
           isLocked={isLocked}
           onOpenHowToPlay={() => setHowToPlayOpen(true)}
-          playerStageInfo={playerStageInfo}
         />
 
         {/* Betting Console (Green, Violet, Red, Numbers 0-9, Big/Small) */}
